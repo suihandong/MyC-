@@ -1,0 +1,2 @@
+ID: 10
+Passengers waiting: 0

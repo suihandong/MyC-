@@ -1,0 +1,5 @@
+Name: Wash
+Destination: 50
+Total Wait: 21
+	Wait at Stop: 19
+	Time on bus: 2

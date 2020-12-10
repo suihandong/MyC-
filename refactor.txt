@@ -1,0 +1,96 @@
+Refactor I Replace Temp With Query
+- List of file Changes
+  1. bus.h
+  2. bus.cc
+-Location of the changes
+  1. bus.h line #127 declare the function SwitchRoute()
+  2. bus.cc line #80-92 move this part of code into the SwitchRoute() function
+  3. bus.cc line #171-177 move this part of code into the SwitchRoute() function
+  4. bus.cc line #68 - 82 implement the function SwitchRoute()
+-Explanation
+    Declare the new function SwitchRoute(), reduce the repeatation of the same
+    functional code and make the code more clear to read.
+
+Refactor II Change Variable and/or Method Name
+-List of file changes
+  1. bus.h
+  2. bus.cc
+-Location of the changes
+  1. bus.h line #50 change the method LoadPassenger() to LoadPassengerToBus()
+  2. bus.cc line #21 change the method LoadPassenger() to LoadPassengerToBus()
+  3. bus.h line #164 change the variable distance_remaining_ to distance_to_next_stop_
+  4. bus.cc line #16, #35, #36, #110, #178, #189 replace the distance_remaining_ with distance_to_next_stop_
+-Explanation
+  Change the method in the Bus class help us distinguish it with the LoadPassengers()
+  function in the stop class. After changing the distance_remaining_ to the distance_to_next_stop_,
+  it is more clear than before. The variable distance_remaining_ could be distance remaining in
+  between the current stop and next stop or the distance remaining from the current stop the the last stop.
+
+Refactor III Extract Method
+- List of file changes
+  1. route.cc
+  2. bus.cc
+- Location of the changes
+  1. route.cc line #27 in IsAtEnd() function
+     origin code line #27:
+      if ((unsigned) destination_stop_index_ >= stops_.size())
+     refactor code line #25:
+      if ((unsigned) destination_stop_index_ >= stops_.size()-1)
+     decrease the checking value of the destination_stop_index_ by one
+  2. route.cc line #37 in NextStop() function
+     origin code line #37:
+      if ((unsigned) destination_stop_index_ >= stops_.size())
+     refactor code line #36:
+      if ((unsigned) destination_stop_index_ >= stops_.size()-1)
+     decrease the checking value of the destination_stop_index_ by one
+  3. route.cc line #50
+     delete the function GetCurrentStop() @ line #50 in origin code
+     the GetCurrentStop() function do the same thing with GetDestinationStop()
+  4. route.cc line #63
+     change the impletmention of the GetPreviousStop() function
+     origin code line #63:
+      return NULL when the destination_stop_index_ is 0 or it is larger than
+      the stops_.size()
+      otherwise, return the pointer to the previous stop
+     refactor code line #49:
+      return the pointer to the first stop if the destination_stop_index_ is 0,
+      otherwise return the pointer to the previous stop
+  5. route.cc line #79
+     change the implemention of the GetNextStop() function
+     origin code line #79:
+      return NULL when the stop is the last stop on the route
+      otherwise, return the pointer to the next stop
+     refactor code line #61:
+      return the pointer to the last stop if the current stop is the last stop
+      on the route
+      otherwise, return the pointer to the next stop
+  6. bus.cc line #95 in Update() function
+     origin code line #95:
+      Stop * current_stop = current_route->GetCurrentStop();
+     refactor code line #99:
+      Stop * current_stop = current_route->GetDestinationStop();
+  7. bus.cc line #119
+     change the impletmention of the UpdateBusData() function
+     origin code line #119:
+      UpdateBusData()
+      do not take in parameter
+      only calculate the average average_longitude and average_latitude for the
+      bus position bu using the previous and current stop's longitude and latitude
+     refactor code line #123:
+      UpdateBusData(bool flag)
+      take in the parameter
+      using the current and next stop's longitude and latitude to calculate the
+      average longitude and latitude. In addition, when the bus is stop at the
+      stop, use the current stop's latitude and longitude to for the bus position
+-Explanation
+  After change the checking value for the IsAtEnd() and NextStop() function, the
+  I don't get seg fault when I run the program. Also, the route can switch
+  between outgoing_route_ and incoming_route_ properly, so the bus can go out
+  and come back on the picture. Delete the GetCurrentStop() function makes the
+  code more clear and easy to read. Changes made on the GetNextStop() and
+  GetPreviousStop() make the bus stay on the screen and not disappear when it
+  arrives at the last stop of the outgoing_route_. Since the GetCurrentStop()
+  function is deleted, so we change the bus.cc line #119 to call the function
+  GetDestinationStop() because it also returns the pointer to the current stop.
+  The new UpdateBusData(bool flag) function make the bus stop at the right Location
+  when the bus is arrived at the stop.
